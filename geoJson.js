@@ -38,16 +38,13 @@ function point(coordinates, data){
   "features": [
     {
       "type": "Feature",
-      "properties": {
-            title: 'Washington, D.C.',
-            'marker-color': '#f86767',
-            'marker-size': 'large',
-            'marker-symbol': 'star',
-            url: 'http://en.wikipedia.org/wiki/Washington,_D.C.'
-        },
       "geometry": {
-        "type": "Point",
-        "coordinates": coordinates
+        "type": "Polygon",
+        "coordinates": [
+          [coordinates,
+          [coordinates[0]-2.5,coordinates[1]+5],
+          [coordinates[0]+2.5,coordinates[1] + 5]]
+        ]
       }
     }
   ]
