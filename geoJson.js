@@ -37,6 +37,7 @@ function point(coordinates, data){
   "type": "FeatureCollection",
   "features": [
     {
+
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
