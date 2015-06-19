@@ -3,17 +3,17 @@ L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.outdoors/{z}/{x}/{y}.png?acce
 
 }).addTo(map);
 
-d3.csv("data/ships_regions.csv")
-  .row(function(d){return d;})
+d3.json("data/regions.json")
+  //.row(function(d){return d;})
   .get(function(error, rows){makeRegions(rows);});
 
-d3.csv("data/ships_ports.csv")
-  .row(function(d){return d;})
+d3.json("data/ports.json")
+  //.row(function(d){return d;})
   .get(function(error, rows){ makePorts(rows); });
 
-d3.csv("data/filtered_ships.csv")
-  .row(function(d){return d;})
-  .get(function(error, rows){makeLines(rows);});
+d3.json("data/all_ships.json")
+  //.row(function(d){return d;})
+  .get(function(error, rows){makeShips(rows);});
 
 ladenStatus = {"Unladen": "a00", "Laden": "0a0"};
 
@@ -39,6 +39,23 @@ L.RotatedMarker = L.Marker.extend({
     L.rotatedMarker = function (pos, options) {
     return new L.RotatedMarker(pos, options);
   };
+
+function makeShips(rows){
+  $.each(rows, function(i, ship){
+    console.log(ship);
+    var coord = [+ship.Position.Longitude, +ship.Position.Latitude];
+    var icon = L.MakiMarkers.icon({icon: "marker", color: (function(){
+        if(ship.LadenStatus){
+          return '#'+ladenStatus[ship.LadenStatus]
+        }
+        return '#00b'
+      })(), size: "s"});
+      L.rotatedMarker([coord[1],coord[0]], {
+        icon: icon,
+        angle: ship.Heading+180 || 180
+      }).addTo(map);
+  });
+}
 
 function makeLines(rows){
   var ships = _.uniq(_.pluck(rows, 'ShipName'));
@@ -85,39 +102,50 @@ function makeLines(rows){
 }  
 
 function makeRegions(rows){
-  var regions = _.uniq(_.pluck(rows, 'region'));
-  $.each(regions, function(i, region){
+  $.each(rows, function(i, region){
     var coords = [];
-    regions[i] = {'name': region, 'data': _.where(rows, {region:region})};
-    $.each(regions[i].data, function(i, obj){
-      coords.push([+obj.latitude, +obj.longitude]);
-    });
-    regions[i].coordinates = coords;
-    L.geoJson(polygon(coords),{
-      "style": {
-         "color": "blue",
-        "weight": .5,
-        "opacity": 0.05
-      },
-    }).addTo(map);
+    $.each(region.Points, function(i, obj){
+        coords.push([+obj.Longitude, +obj.Latitude]);
+      });
+      L.geoJson(polygon(coords),{
+        "style": {
+           "color": "blue",
+          "weight": 0.5,
+          "opacity": 0.05
+        },
+      }).addTo(map);
   });
+  // var regions = _.uniq(_.pluck(rows, 'region'));
+  // $.each(regions, function(i, region){
+  //   var coords = [];
+  //   regions[i] = {'name': region, 'data': _.where(rows, {region:region})};
+  //   $.each(regions[i].data, function(i, obj){
+  //     coords.push([+obj.latitude, +obj.longitude]);
+  //   });
+  //   regions[i].coordinates = coords;
+  //   L.geoJson(polygon(coords),{
+  //     "style": {
+  //        "color": "blue",
+  //       "weight": .5,
+  //       "opacity": 0.05
+  //     },
+  //   }).addTo(map);
+  // });
 }
 
 function makePorts(rows){
-  var ports = _.uniq(_.pluck(rows, 'port'));
-  $.each(ports, function(i, port){
+  $.each(rows, function(i, port){
+    console.log(port)
     var coords = [];
-    ports[i] = {'name': port, 'data': _.where(rows, {port:port})};
-    $.each(ports[i].data, function(i, obj){
-      coords.push([+obj.latitude, +obj.longitude]);
-    });
-    ports[i].coordinates = coords;
-    L.geoJson(polygon(coords),{
-      "style": {
-         "color": "red",
-        "weight": 2,
-        "opacity": 0.65
-      },
-    }).addTo(map);
+    $.each(port.Points, function(i, obj){
+        coords.push([+obj.Longitude, +obj.Latitude]);
+      });
+      L.geoJson(polygon(coords),{
+        "style": {
+           "color": "red",
+          "weight": 2,
+          "opacity": 0.65
+        },
+      }).addTo(map);
   });
 }
