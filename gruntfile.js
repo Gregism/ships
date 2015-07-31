@@ -5,14 +5,14 @@ module.exports = function(grunt){
         livereload: true,
       },
       html:{
-        files: ['lists/templates/*.html'],
+        files: ['*.html'],
         
       },
       js:{
-        files: ['scripts/*.js'],
+        files: ['js/*.js'],
       },
       css:{
-        files: ['lists/static/**/*.css'],
+        files: ['css/**/*.css'],
       }
     }
   });
