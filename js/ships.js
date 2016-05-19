@@ -1,6 +1,6 @@
 var ships = (function(){
   function loadShips(){
-    d3.csv("/data/smallest_ships.csv")
+    d3.csv("/ships/data/smallest_ships.csv")
       .get(function(error, rows){
         showShips(rows);});
   }
